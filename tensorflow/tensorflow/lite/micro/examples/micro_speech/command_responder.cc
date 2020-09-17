@@ -15,6 +15,10 @@ limitations under the License.
 
 #include "tensorflow/lite/micro/examples/micro_speech/command_responder.h"
 #include <cstdio>
+
+// TF LWM2M Resource updater
+extern "C" void update_tf_resource(const char *value);  // found in main.cpp...
+
 // The default implementation writes out the name of the recognized command
 // to the error console. Real applications will want to take some custom
 // action instead, and should implement their own versions of this function.
@@ -24,5 +28,10 @@ void RespondToCommand(tflite::ErrorReporter* error_reporter,
   
   if (is_new_command) {
      TF_LITE_REPORT_ERROR(error_reporter, "Heard %s (%d) @%dms", found_command, score, current_time);
+
+     // Update the TF LWM2M resource...
+     char tf_value[64];
+     sprintf(tf_value,"Heard %s (%d) @%dms", found_command, score, current_time);
+     update_tf_resource(tf_value);
   }
 }

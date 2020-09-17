@@ -47,11 +47,20 @@ static M2MResource* m2m_put_res;
 static M2MResource* m2m_post_res;
 static M2MResource* m2m_deregister_res;
 static M2MResource* m2m_factory_reset_res;
+static M2MResource* tf_res;
 static SocketAddress sa;
 
 EventQueue queue(32 * EVENTS_EVENT_SIZE);
 Thread t;
 Mutex value_increment_mutex;
+Mutex tf_value_increment_mutex;
+
+// TF resource update
+extern "C" void update_tf_resource(const char *value) {
+    tf_value_increment_mutex.lock();
+    tf_res->set_value((const uint8_t *)value,(const uint32_t)strlen(value));
+    tf_value_increment_mutex.unlock();
+}
 
 void print_client_ids(void)
 {
@@ -265,6 +274,9 @@ int main(void)
     if (m2m_factory_reset_res) {
         m2m_factory_reset_res->set_execute_function(factory_reset);
     }
+
+    // TensorFlow recognition resource /123/0/4567
+    tf_res = M2MInterfaceFactory::create_resource(m2m_obj_list, 123, 0, 4567, M2MResourceInstance::STRING, M2MBase::GET_ALLOWED);
 
     printf("Register Pelion Device Management Client\n\n");
 
