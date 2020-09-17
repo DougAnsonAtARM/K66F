@@ -62,10 +62,10 @@ char tf_last_value[64];
 // TF resource update
 extern "C" void update_tf_resource(const char *value,uint8_t score,int32_t current_time) {
     tf_value_increment_mutex.lock();
-    if (strcmp(tf_last_value,value) != 0) {
+    //if (strcmp(tf_last_value,value) != 0) {
         tf_res->set_value((const uint8_t *)value,(const uint32_t)strlen(value));
         sprintf(tf_last_value,"%s",value);
-    }
+    //}
     tf_value_increment_mutex.unlock();
 }
 #endif

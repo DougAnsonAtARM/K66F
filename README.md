@@ -33,7 +33,7 @@ cd K66F
 ### 1) PDM application (Must for first time)
 
 ```sh
-mbed target K6GF
+mbed target K66F
 mbed toolchain GCC_ARM
 mbed device-management init -d arm.com --model-name example-app --force -q
 mbed compile -f # flashes the firmware to device 
