@@ -56,12 +56,16 @@ EventQueue queue(32 * EVENTS_EVENT_SIZE);
 Thread t;
 Mutex value_increment_mutex;
 Mutex tf_value_increment_mutex;
+char tf_last_value[64];
 
 #ifdef ENABLE_TENSORFLOW
 // TF resource update
-extern "C" void update_tf_resource(const char *value) {
+extern "C" void update_tf_resource(const char *value,uint8_t score,int32_t current_time) {
     tf_value_increment_mutex.lock();
-    tf_res->set_value((const uint8_t *)value,(const uint32_t)strlen(value));
+    if (strcmp(tf_last_value,value) != 0) {
+        tf_res->set_value((const uint8_t *)value,(const uint32_t)strlen(value));
+        sprintf(tf_last_value,"%s",value);
+    }
     tf_value_increment_mutex.unlock();
 }
 #endif
@@ -292,7 +296,7 @@ int main(void)
     cloud_client->setup(network);
 
     t.start(callback(&queue, &EventQueue::dispatch_forever));
-    queue.call_every(5000, value_increment);
+    queue.call_every(60000, value_increment);
 
 #ifdef ENABLE_TENSORFLOW
     printf("Enabling Tensor flow library\n");
